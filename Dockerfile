@@ -10,6 +10,7 @@ RUN rm -rf *.tar.xz
 FROM ghcr.io/tailscale/tailscale:v1.34.1 as ts
 FROM ghcr.io/netauth/netauth:v0.6.1 as netauth
 FROM grafana/agent:latest as grafana
+FROM dopplerhq/cli:3 as doppler
 
 FROM golang:1.19-alpine as localizer
 RUN apk add git
@@ -33,10 +34,11 @@ COPY --from=grafana /bin/grafana-agent /bin/grafana-agent
 
 COPY --from=netauth /n /bin/netauth
 COPY --from=localizer /localize /bin/localize
+COPY --from=doppler /bin/doppler /bin/doppler
 
 COPY ./etc /etc
 RUN chmod 0400 /etc/sudoers
 COPY ./entrypoint.sh /entrypoint
 RUN chmod +x /entrypoint
 
-ENTRYPOINT [ "/entrypoint" ]
+ENTRYPOINT [ "/bin/doppler" , "run", "--" , "/entrypoint.sh"]
