@@ -1,4 +1,5 @@
 #!/bin/sh
+set -a; source /etc/environment; set +a;
 
 export DATA_ROOT=${VOLUME_PATH:-/data}
 
