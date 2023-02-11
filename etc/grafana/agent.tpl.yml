@@ -1,0 +1,49 @@
+integrations:
+  node_exporter:
+    enabled: true
+    relabel_configs:
+      - replacement: ${HOSTNAME}.${TAILNET}
+        target_label: instance
+  prometheus_remote_write:
+    - basic_auth:
+        password: $PROM_SECRET
+        username: $PROM_USERNAME
+      url: $PROM_URL
+logs:
+  configs:
+    - clients:
+        - basic_auth:
+            password: $LOKI_SECRET
+            username: $LOKI_USERNAME
+          url: $LOKI_URL
+      name: integrations
+      positions:
+        filename: /tmp/positions.yaml
+      scrape_configs:
+        - job_name: integrations/node_exporter_direct_scrape
+          static_configs:
+            - labels:
+                __path__: /var/log/socklog/*/current
+                instance: ${HOSTNAME}.${TAILNET}
+                job: integrations/node_exporter
+              targets:
+                - localhost
+            - labels:
+                __path__: /var/log/socklog/{}
+                instance: ${HOSTNAME}.${TAILNET}
+                job: integrations/node_exporter
+              targets:
+                - localhost
+      target_config:
+        sync_period: 10s
+metrics:
+  configs:
+    - name: integrations
+      remote_write:
+        - basic_auth:
+            password: $PROM_SECRET
+            username: $PROM_USERNAME
+          url: $PROM_URL
+  global:
+    scrape_interval: 60s
+  wal_directory: /tmp/grafana-agent-wal

@@ -1,0 +1,4 @@
+#!/bin/sh
+
+envsubst < /etc/grafana/agent.tpl.yml > /etc/grafana/agent.yml
+exec /bin/grafana-agent --config.file /etc/grafana/agent.yml

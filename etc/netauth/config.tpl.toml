@@ -1,0 +1,5 @@
+[core]
+    server = "${NETAUTH_SERVER}"
+
+[tls]
+    certificate = "keys/tls.pem"
