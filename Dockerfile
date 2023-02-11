@@ -40,5 +40,7 @@ COPY ./etc /etc
 RUN chmod 0400 /etc/sudoers
 COPY ./entrypoint.sh /entrypoint
 RUN chmod +x /entrypoint
+COPY ./init.sh /sbin/init
+RUN chmod +x /sbin/init
 
 ENTRYPOINT [ "/bin/doppler" , "run", "--" , "/entrypoint.sh"]
