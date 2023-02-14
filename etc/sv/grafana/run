@@ -1,4 +1,8 @@
-#!/bin/sh
+#!/bin/bash
+
+source /bin/secrets.sh
+
+sv start init || exit 1
 
 envsubst < /etc/grafana/agent.tpl.yml > /etc/grafana/agent.yml
-exec /bin/grafana-agent --config.file /etc/grafana/agent.yml
+/bin/grafana-agent --config.file /etc/grafana/agent.yml

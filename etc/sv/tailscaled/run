@@ -1,0 +1,17 @@
+#!/bin/bash
+
+export DATA_ROOT=${VOLUME_PATH:-/data}
+
+## 1. Start tailscaled
+
+TS_DATA_DIR="${DATA_ROOT}/tailscale/data"
+TS_RUNTIME="/var/run/tailscale"
+
+# create tailscale data driectories if not present
+[ ! -d "$TS_DATA_DIR" ] && mkdir -p $TS_DATA_DIR
+[ ! -d "$TS_RUNTIME" ] && mkdir -p $TS_RUNTIME
+
+# start tailscale daemon
+/bin/tailscaled \
+  --statedir=$TS_DATA_DIR \
+  --socket=$TS_RUNTIME/tailscaled.sock

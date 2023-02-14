@@ -1,0 +1,43 @@
+#!/bin/bash
+
+source /bin/secrets.sh
+
+SERVICES="tailscaled"
+
+for svc in $SERVICES; do
+  sv start $svc || exit 1
+done
+
+export TS_HOSTNAME="tc1.tail9b256.ts.net"
+
+/bin/tailscale up \
+  --ssh \
+  --accept-routes \
+  --auth-key "${TSKEY}" \
+  --hostname "${TS_HOSTNAME:-$HOSTNAME}" || exit 1
+
+
+FQDN="$(tailscale status --json | jq --raw-output  .Self.DNSName | sed 's/\.$//')"
+
+/bin/tailscale cert "$FQDN" \
+  --key-file "/etc/tls/${FQDN}.key" \
+  --cert-file "/etc/tls/${FQDN}.key" || exit 1
+
+
+## configure netauth
+NETAUTH_DIR="/etc/netauth"
+[ ! -d "$NETAUTH_DIR/keys" ] && mkdir -p "${NETAUTH_DIR}/keys"
+
+if [ -n "$NETAUTH_SERVER" ]; then
+  # fetch server certificate
+  openssl s_client \
+    -connect "${NETAUTH_SERVER}:1729" 2>/dev/null </dev/null | \
+    sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > "${NETAUTH_DIR}/keys/tls.pem"
+
+  envsubst < "${NETAUTH_DIR}/config.tpl.toml" > "${NETAUTH_DIR}/config.toml"
+
+  # sync users and groups
+  /bin/localize --min-gid 2000 --min-uid 2000
+fi
+
+exec /bin/sleep 86400

@@ -28,7 +28,7 @@ COPY --from=build /rootfs /
 RUN xbps-install -Suy xbps
 RUN xbps-install -Sy gettext jq vsv openssh
 
-RUN mkdir -p /run/runit/runsvdir/current
+#RUN mkdir -p /etc/runit/runsvdir/default
 
 COPY --from=ts /usr/local/bin/tailscale /bin/tailscale
 COPY --from=ts /usr/local/bin/tailscaled /bin/tailscaled
@@ -40,10 +40,16 @@ COPY --from=doppler /bin/doppler /bin/doppler
 
 COPY ./etc /etc
 RUN chmod 0400 /etc/sudoers
+
+# set +x bit on all service files
+RUN find /etc/sv -type f -name 'run' | xargs -L1 chmod +x
+
+COPY ./bin/secrets.sh /bin/secrets.sh
 COPY ./entrypoint.sh /entrypoint
 RUN chmod +x /entrypoint
-COPY ./init.sh /sbin/init
-RUN chmod +x /sbin/init
-RUN ln -sf /etc/sv/sshd /run/runit/runsvdir/current/sshd
+RUN ln -sf /etc/sv/sshd /etc/runit/runsvdir/default/
+RUN ln -sf /etc/sv/tailscaled /etc/runit/runsvdir/default/
+RUN ln -sf /etc/sv/init /etc/runit/runsvdir/default/
+RUN ln -sf /etc/sv/grafana /etc/runit/runsvdir/default/
 
-ENTRYPOINT [ "/bin/doppler" , "run", "--" , "/entrypoint.sh"]
+ENTRYPOINT [ "/bin/doppler" , "run", "--" , "/sbin/runsvdir", "-P", ""/run/runit/runsvdir/current"]
