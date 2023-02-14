@@ -1,0 +1,19 @@
+FROM alpine:3.13 as build
+
+RUN mkdir /rootfs
+ADD https://repo-default.voidlinux.org/live/current/void-x86_64-ROOTFS-20221001.tar.xz /rootfs
+WORKDIR /rootfs
+RUN tar xf *.tar.xz
+RUN rm -rf *.tar.xz
+
+FROM scratch as kernel
+
+COPY --from=build /rootfs /
+
+RUN xbps-install -Suy xbps
+RUN xbps-install -Sy linux6.1 linux6.1-headers linux-firmware
+RUN ls /boot/
+
+FROM scratch
+COPY --from=kernel /boot /boot
+COPY --from=kernel /lib/modules /lib/modules
