@@ -26,7 +26,7 @@ FROM scratch
 COPY --from=build /rootfs /
 
 RUN xbps-install -Suy xbps
-RUN xbps-install -Sy gettext jq vsv
+RUN xbps-install -Sy gettext jq vsv openssh
 
 COPY --from=ts /usr/local/bin/tailscale /bin/tailscale
 COPY --from=ts /usr/local/bin/tailscaled /bin/tailscaled
@@ -42,5 +42,6 @@ COPY ./entrypoint.sh /entrypoint
 RUN chmod +x /entrypoint
 COPY ./init.sh /sbin/init
 RUN chmod +x /sbin/init
+RUN ln -sf /etc/sv/sshd /run/runit/runsvdir/current/sshd
 
 ENTRYPOINT [ "/bin/doppler" , "run", "--" , "/entrypoint.sh"]
