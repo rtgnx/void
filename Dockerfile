@@ -28,6 +28,8 @@ COPY --from=build /rootfs /
 RUN xbps-install -Suy xbps
 RUN xbps-install -Sy gettext jq vsv openssh
 
+RUN mkdir -p /run/runit/runsvdir/current
+
 COPY --from=ts /usr/local/bin/tailscale /bin/tailscale
 COPY --from=ts /usr/local/bin/tailscaled /bin/tailscaled
 COPY --from=grafana /bin/grafana-agent /bin/grafana-agent
