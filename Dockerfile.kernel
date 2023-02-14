@@ -13,6 +13,8 @@ COPY --from=build /rootfs /
 RUN xbps-install -Suy xbps
 RUN xbps-install -Sy linux6.1 linux6.1-headers linux-firmware
 RUN ls /boot/
+WORKDIR /boot
+RUN ln -sf "$(find . -name 'vmlinuz-*' -type f)" /boot/vmlinux
 
 FROM scratch
 COPY --from=kernel /boot /boot
