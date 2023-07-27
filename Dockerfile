@@ -17,9 +17,17 @@ WORKDIR /rootfs
 RUN tar xvf *.tar.xz
 RUN rm -rf *.tar.xz
 
+FROM restic/restic:0.15.2 as restic
+FROM ghcr.io/tailscale/tailscale:v1.44.0 as ts
+
 FROM scratch
 
 COPY --from=build /rootfs /
+COPY --from=ts /usr/local/bin/tailscale /bin/tailscale
+COPY --from=ts /usr/local/bin/tailscaled /bin/tailscaled
+COPY --from=restic /usr/bin/restic /bin/restic
+
+COPY ./etc /etc
 
 RUN xbps-install -u xbps
 RUN xbps-install -Sy socklog socklog-void cronie vsv
