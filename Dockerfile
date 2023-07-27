@@ -30,10 +30,17 @@ COPY --from=restic /usr/bin/restic /bin/restic
 COPY ./etc /etc
 
 RUN xbps-install -u xbps
-RUN xbps-install -Sy socklog socklog-void cronie vsv
+RUN xbps-install -Sy $(cat /etc/packages.txt | tr '\n' ' ')
+
 RUN mkdir -p /run/runit/runsvdir/current
 
-RUN ln -sf /etc/sv/socklog-unix /var/service/
-RUN ln -sf /etc/sv/cronie /var/service/
+RUN rm -rf /var/cache
+RUN rm -rf /usr/share/kbd /usr/share/i18n /usr/share/man
+RUN rm -rf /usr/share/info
+
+
+
+RUN find /etc/sv -type f -name 'run' | xargs -L1 chmod +x
+RUN ln -sf /etc/sv/init /var/service/
 
 ENTRYPOINT ["runsvdir", "-P",  "/run/runit/runsvdir/current" ]

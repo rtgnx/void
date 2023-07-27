@@ -1,0 +1,23 @@
+#!/bin/bash
+
+
+for tpl in $(find /etc -type f -name '*.tpl.*'); do
+  envsubst < "$tpl" > "$(echo "$tpl" | sed 's/.tpl//')"
+done
+
+
+ln -sf /etc/sv/socklog-unix /var/service/
+ln -sf /etc/sv/cronie /var/service/
+ln -sf /etc/sv/tailscaled /var/service/
+
+sv start tailscaled || exit 1
+
+
+/bin/tailscale up \
+  --ssh \
+  --accept-routes \
+  --auth-key "${TSKEY}" \
+  --hostname "${FQDN}" || exit 1
+
+
+/bin/sleep infinity
