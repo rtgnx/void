@@ -1,5 +1,6 @@
 vsv
 vpm
+xtools
 socklog
 socklog-void
 cronie
