@@ -12,12 +12,16 @@ ln -sf /etc/sv/tailscaled /var/service/
 
 sv start tailscaled || exit 1
 
-
+export TS_HOSTNAME=${TS_HOSTNAME:-${HOSTNAEM}}
 /bin/tailscale up \
   --ssh \
   --accept-routes \
   --auth-key "${TSKEY}" \
-  --hostname "${FQDN}" || exit 1
+  --hostname "$TS_HOSTNAME" || exit 1
+
+FQDN="$(tailscale status --json 2>/dev/null | jq .Self.DNSName | tr -d '\"' | sed 's/net./net/')"
+
+cd /tmp && tailscale cert "${FQDN}"
 
 
 /bin/sleep infinity

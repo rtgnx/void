@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export DATA_ROOT=${VOLUME_PATH:-/data}
+export DATA_ROOT=${VOLUME_PATH:-/var/lib}
 
 ## 1. Start tailscaled
 
