@@ -13,9 +13,7 @@ FROM alpine:3.13 as build
 ARG VOID_BUILD_NO=20230628
 ARG BUILDPLATFORM
 ARG TARGETPLATFORM
-RUN mkdir /rootfs
-ADD ./util/fetch.sh /bin/fetch
-RUN chmod +x /bin/fetch
+ADD --chmod=0755 ./util/fetch.sh /bin/fetch
 RUN /bin/fetch
 
 WORKDIR /rootfs
@@ -39,10 +37,12 @@ RUN xbps-install -Sy $(cat /etc/packages.txt | tr '\n' ' ')
 
 RUN mkdir -p /run/runit/runsvdir/current
 
-RUN rm -rf /var/cache
-RUN rm -rf /usr/share/kbd /usr/share/i18n /usr/share/man
-RUN rm -rf /usr/share/info
-
+RUN rm -rf \
+  /var/cache \
+  /usr/share/kbd \
+  /usr/share/i18n \
+  /usr/share/man \
+  /usr/share/info
 
 
 RUN find /etc/sv -type f -name 'run' | xargs -L1 chmod +x
