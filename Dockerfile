@@ -1,5 +1,7 @@
-ARG ARCH=x86_64
+#ARG ARCH=x86_64
 ARG VOID_BUILD_NO=20230628
+ARG BUILDPLATFORM
+ARG TARGETPLATFORM
 
 # AMD64 - GLBIC https://repo-default.voidlinux.org/live/current/void-x86_64-ROOTFS-20230628.tar.xz
 # AMD64 - MUSL https://repo-default.voidlinux.org/live/current/void-x86_64-musl-ROOTFS-20230628.tar.xz
@@ -7,11 +9,14 @@ ARG VOID_BUILD_NO=20230628
 # AARCH64 - MUSL https://repo-default.voidlinux.org/live/current/void-aarch64-musl-ROOTFS-20230628.tar.xz
 
 FROM alpine:3.13 as build
-ARG ARCH=x86_64
+#ARG ARCH=x86_64
 ARG VOID_BUILD_NO=20230628
-
+ARG BUILDPLATFORM
+ARG TARGETPLATFORM
 RUN mkdir /rootfs
-ADD https://repo-default.voidlinux.org/live/current/void-$ARCH-ROOTFS-$VOID_BUILD_NO.tar.xz /rootfs
+ADD ./util/fetch.sh /bin/fetch
+RUN chmod +x /bin/fetch
+RUN /bin/fetch
 
 WORKDIR /rootfs
 RUN tar xvf *.tar.xz
