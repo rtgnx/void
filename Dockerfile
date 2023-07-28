@@ -13,9 +13,7 @@ FROM alpine:3.13 as build
 ARG VOID_BUILD_NO=20230628
 ARG BUILDPLATFORM
 ARG TARGETPLATFORM
-RUN mkdir /rootfs
-ADD ./util/fetch.sh /bin/fetch
-RUN chmod +x /bin/fetch
+ADD --chmod=0755 ./util/fetch.sh /bin/fetch
 RUN /bin/fetch
 
 WORKDIR /rootfs
