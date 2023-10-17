@@ -32,7 +32,7 @@ COPY --from=restic /usr/bin/restic /bin/restic
 
 COPY ./etc /etc
 
-RUN xbps-install -u xbps
+RUN xbps-install -Syu xbps
 RUN xbps-install -Sy $(cat /etc/packages.txt | tr '\n' ' ')
 
 RUN mkdir -p /run/runit/runsvdir/current
