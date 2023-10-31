@@ -9,6 +9,7 @@ done
 ln -sf /etc/sv/socklog-unix /var/service/
 ln -sf /etc/sv/cronie /var/service/
 ln -sf /etc/sv/tailscaled /var/service/
+ln -sf /etc/sv/svagent /var/service/
 
 sv start tailscaled || exit 1
 
