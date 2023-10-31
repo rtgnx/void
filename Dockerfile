@@ -22,12 +22,14 @@ RUN rm -rf *.tar.xz
 
 FROM restic/restic:0.15.2 as restic
 FROM ghcr.io/tailscale/tailscale:v1.44.0 as ts
+FROM ghcr.io/rtgnx/svagent:v0.0.1-1 as sv
 
 FROM scratch
 
 COPY --from=build /rootfs /
 COPY --from=ts /usr/local/bin/tailscale /bin/tailscale
 COPY --from=ts /usr/local/bin/tailscaled /bin/tailscaled
+COPY --from=sv /svagent /bin/svagent
 COPY --from=restic /usr/bin/restic /bin/restic
 
 COPY ./etc /etc
